@@ -1,0 +1,35 @@
+#!/usr/local/bin/bpftrace
+
+#include <linux/sched.h>
+
+BEGIN
+{
+	printf("Tracing off-CPU time (us) with waker stacks. Ctrl-C to end.\n");
+}
+
+kprobe:try_to_wake_up
+{
+	$p = (struct task_struct *)arg0;
+
+	if (@ts[$p->pid]) {
+		$offcpu_us = (nsecs - @ts[$p->pid]) / 1000;
+		@us[comm, @offcpu[$p->pid], kstack] = hist($offcpu_us);
+		delete(@ts[$p->pid]);
+		delete(@offcpu[$p->pid]);
+	}
+}
+
+kprobe:finish_task_switch
+{
+	$prev = (struct task_struct *)arg0;
+
+	// record timestamp of sleeping task:
+	@ts[$prev->pid] = nsecs;
+	@offcpu[$prev->pid] = kstack;
+}
+
+END
+{
+	clear(@offcpu);
+	clear(@ts);
+}
