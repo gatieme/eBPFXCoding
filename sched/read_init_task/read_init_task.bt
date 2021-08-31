@@ -1,0 +1,10 @@
+#include <linux/sched.h>
+
+BEGIN
+{
+	$task = (struct task_struct *)kaddr("init_task");
+
+	printf("init task name %s\n", $task->comm);
+
+	exit();
+}
