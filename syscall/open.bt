@@ -1,0 +1,16 @@
+/* do_sys_open(int dfd, const char __user *filename, int flags, umode_t mode) */
+
+k:do_sys_open
+{
+	@name[tid] = arg1;
+}
+
+kr:do_sys_open /@name[tid]/
+{
+	if ((int32)retval < 0) {
+		printf("%s open %s err %d\n", comm, str(@name[tid]), retval);
+	}
+
+	delete(@name[tid]);
+}
+
