@@ -1,0 +1,5 @@
+k:__kmalloc, k:__kmalloc_node / 2048 < arg0 && arg0 <= 4096 /
+{
+	@detail[comm, kstack] = count();
+	@size = lhist(arg0, 2048, 4096, 1024)
+}
