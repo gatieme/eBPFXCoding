@@ -1,0 +1,17 @@
+#include <linux/sched.h>
+
+k:finish_task_switch
+{
+	$prev = (struct task_struct *)arg0;
+
+	if ($prev->pid == (int32)cpid) {
+		@start[$prev->pid] = nsecs;
+	}
+
+	$last = @start[tid];
+
+	if ($last != 0) {
+		@off[kstack, comm] = sum(nsecs - $last);
+		delete(@start[tid]);
+	}
+}

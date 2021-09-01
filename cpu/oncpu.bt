@@ -1,0 +1,6 @@
+//bpftrace ./oncpu.bt -c `pidstats 1 10`
+
+profile:hz:9999 /pid == cpid/
+{
+	@[kstack] = count();
+}
