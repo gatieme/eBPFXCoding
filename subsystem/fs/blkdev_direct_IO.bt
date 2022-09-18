@@ -1,0 +1,13 @@
+k:blkdev_direct_IO
+{
+	@when[tid] = nsecs;
+	@how[tid] = kstack;
+}
+
+kr:blkdev_direct_IO /@when[tid]/
+{
+	$delay = nsecs - @when[tid];
+	@usecs[@how[tid]] = hist($delay);
+	delete(@when[tid]);
+	delete(@how[tid]);
+}

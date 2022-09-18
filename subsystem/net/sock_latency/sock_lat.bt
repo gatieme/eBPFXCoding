@@ -1,0 +1,16 @@
+struct tcp_sock {
+	char pad[12];
+	__u16 dport;
+	__u16 sport;
+};
+
+k:tcp_sendmsg
+{
+	if (!@sk[tid]) {
+		$tcp = (struct tcp_sock *)arg0;
+		$sport = $tcp->sport;
+
+		$be_port = $tcp->dport;
+		$dport = ($be_port >> 8) | ($be_port)
+	}
+}

@@ -1,0 +1,26 @@
+#include <linux/tcp.h>
+
+
+k:tcp_write_xmit /@tcp == 0/
+{
+	$sk = (struct sock *)arg0;
+	$family = $sk->__sk_common.skc_family;
+
+	if ($family == AF_INET) {
+		$sport = $sk->__sk_common.skc_num;
+		$dport = $sk->__sk_common.skc_dport;
+		$dport = ($dport >> 8) | (($dport << 8) & 0xff00);
+
+		if ($sport == 22 && $dport == 42666) {
+			@tcp = (struct tcp_sock *)arg0;
+			printf("got sk from %s/%d\n", comm, pid);
+		}
+	}
+}
+
+i:s:1 /@tcp/
+{
+	printf("data_segs_out %u una 0x%x wnd 0x%x\n",
+		@tcp->data_segs_out, @tcp->snd_una, @tcp->snd_wnd);
+
+}

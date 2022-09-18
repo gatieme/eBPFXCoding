@@ -1,0 +1,16 @@
+/* do_sys_open(int dfd, const char )*/
+k:do_sys_open
+{
+	@name[tid] = uptr(arg1);
+}
+
+kr:do_sys_open /@name[tid]/
+{
+	if ((int32)retval < 0) {
+		printf("%s open %s err %d\n", comm, str(@name[tid]), retval);
+	}
+
+	delete(@name[tid]);
+}
+
+

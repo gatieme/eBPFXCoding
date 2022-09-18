@@ -1,0 +1,6 @@
+
+
+tracepoint:syscalls:sys_enter_open /comm == "cat"/
+{
+	printf("%s %s\n", comm, str(args->filename));
+}
