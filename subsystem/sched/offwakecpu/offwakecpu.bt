@@ -1,6 +1,14 @@
 #!/usr/local/bin/bpftrace
 
+#ifndef BPFTRACE_HAVE_BTF
+#include <linux/types.h>
+/*
+	607ca46e97a1 UAPI: (Scripted) Disintegrate include/linux
+	error: unknown type name '__aligned_u64'
+*/
+#include <uapi/linux/types.h>
 #include <linux/sched.h>
+#endif
 
 BEGIN
 {
@@ -13,6 +21,7 @@ kprobe:try_to_wake_up
 	@waker[$p->pid] = kstack;
 }
 
+kprobe:finish_task_switch.isra.*,
 kprobe:finish_task_switch
 {
 	$prev = (struct task_struct *)arg0;
